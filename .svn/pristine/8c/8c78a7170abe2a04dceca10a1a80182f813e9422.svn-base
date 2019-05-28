@@ -1,0 +1,782 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>My JSP 'copy.jsp' starting page</title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<script type="text/javascript" src="My97DatePicker/WdatePicker.js">
+	</script>
+  </head>
+  
+  <body>	
+  <h1>复制出运单</h1>
+   <form action="SaveServlet" method="post">
+   	<table border="1">
+   		采购：<input name="purchase" type="text" value="<%=request.getAttribute("purchase")%>"/>
+   		销售：<input name="sale" type="text" value="<%=request.getAttribute("sale")%>"/>
+   		客户名：<input name="clientName" type="text" value="<%=request.getAttribute("clientName")%>"/>
+	   	<br/>
+	    <c:if test="${attrSource == 1 && auth == 1}">
+	   	收货人地址(用&ltbr&gt换行)：<textarea name="address" cols="45" rows="5"><%=request.getAttribute("address")%></textarea>
+	   	<br/>
+	   	</c:if>
+	    <c:if test="${attrSource == 0}">
+	   	收货人地址(用&ltbr&gt换行)：<textarea name="address" cols="45" rows="5"><%=request.getAttribute("address")%></textarea>
+	   	<br/>
+	   	</c:if>
+	    <c:if test="${attrSource == 1 && auth != 1}">
+	    <span style="display:none;">
+	   	收货人地址(用&ltbr&gt换行)：<textarea name="address" cols="45" rows="5"><%=request.getAttribute("address")%></textarea>
+	   	</span>
+	   	<br/>
+	   	</c:if>
+	   	<table border="1">
+	   		<tr>
+	   			<td>采购合同号</td>
+	   			<td>工厂名称</td>
+	   			<td>合同金额</td>
+	   			<td>第几次出货批次</td>
+	   			<td>总共几次出货批次</td>
+	   			<td>本次出口人民币金额</td>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("conid1")!=null){
+	   				%>
+	   			<td><input type="text" name="purno1" value="<%=request.getAttribute("purno1")%>"/></td>
+	   			<td><input type="text" name="factory1" value="<%=request.getAttribute("factory1")%>"/></td>
+	   			<td><input type="text" name="money1" value="<%=request.getAttribute("money1")%>"/></td>
+	   			<td><input type="text" name="times1" value="<%=request.getAttribute("times1")%>"/></td>
+	   			<td><input type="text" name="totaltimes1" value="<%=request.getAttribute("totaltimes1")%>"/></td>
+	   			<td><input type="text" name="rmb1" value="<%=request.getAttribute("rmb1")%>"/></td>
+	   			<td><input type="hidden" name="conid1" value="<%=request.getAttribute("conid1")%>"/></td>
+	   			<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno1"/></td>
+	   			<td><input type="text" name="factory1"/></td>
+	   			<td><input type="text" name="money1"/></td>
+	   			<td><input type="text" name="times1"/></td>
+	   			<td><input type="text" name="totaltimes1"/></td>
+	   			<td><input type="text" name="rmb1"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid2")!=null){
+	   				%>
+	   			<td><input type="text" name="purno2" value="<%=request.getAttribute("purno2")%>"/></td>
+	   			<td><input type="text" name="factory2" value="<%=request.getAttribute("factory2")%>"/></td>
+	   			<td><input type="text" name="money2" value="<%=request.getAttribute("money2")%>"/></td>
+	   			<td><input type="text" name="times2" value="<%=request.getAttribute("times2")%>"/></td>
+	   			<td><input type="text" name="totaltimes2" value="<%=request.getAttribute("totaltimes2")%>"/></td>
+	   			<td><input type="text" name="rmb2" value="<%=request.getAttribute("rmb2")%>"/></td>
+	   			<td><input type="hidden" name="conid2" value="<%=request.getAttribute("conid2")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno2"/></td>
+	   			<td><input type="text" name="factory2"/></td>
+	   			<td><input type="text" name="money2"/></td>
+	   			<td><input type="text" name="times2"/></td>
+	   			<td><input type="text" name="totaltimes2"/></td>
+	   			<td><input type="text" name="rmb2"/></td>
+		   		<%} %>
+	   			
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid3")!=null){
+	   				%>
+	   			<td><input type="text" name="purno3" value="<%=request.getAttribute("purno3")%>"/></td>
+	   			<td><input type="text" name="factory3" value="<%=request.getAttribute("factory3")%>"/></td>
+	   			<td><input type="text" name="money3" value="<%=request.getAttribute("money3")%>"/></td>
+	   			<td><input type="text" name="times3" value="<%=request.getAttribute("times3")%>"/></td>
+	   			<td><input type="text" name="totaltimes3" value="<%=request.getAttribute("totaltimes3")%>"/></td>
+	   			<td><input type="text" name="rmb3" value="<%=request.getAttribute("rmb3")%>"/></td>
+	   			<td><input type="hidden" name="conid3" value="<%=request.getAttribute("conid3")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno3"/></td>
+	   			<td><input type="text" name="factory3"/></td>
+	   			<td><input type="text" name="money3"/></td>
+	   			<td><input type="text" name="times3"/></td>
+	   			<td><input type="text" name="totaltimes3"/></td>
+	   			<td><input type="text" name="rmb3"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid4")!=null){
+	   				%>
+	   			<td><input type="text" name="purno4" value="<%=request.getAttribute("purno4")%>"/></td>
+	   			<td><input type="text" name="factory4" value="<%=request.getAttribute("factory4")%>"/></td>
+	   			<td><input type="text" name="money4" value="<%=request.getAttribute("money4")%>"/></td>
+	   			<td><input type="text" name="times4" value="<%=request.getAttribute("times4")%>"/></td>
+	   			<td><input type="text" name="totaltimes4" value="<%=request.getAttribute("totaltimes4")%>"/></td>
+	   			<td><input type="text" name="rmb4" value="<%=request.getAttribute("rmb4")%>"/></td>
+	   			<td><input type="hidden" name="conid4" value="<%=request.getAttribute("conid4")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno4"/></td>
+	   			<td><input type="text" name="factory4"/></td>
+	   			<td><input type="text" name="money4"/></td>
+	   			<td><input type="text" name="times4"/></td>
+	   			<td><input type="text" name="totaltimes4"/></td>
+	   			<td><input type="text" name="rmb4"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid5")!=null){
+	   				%>
+	   			<td><input type="text" name="purno5" value="<%=request.getAttribute("purno5")%>"/></td>
+	   			<td><input type="text" name="factory5" value="<%=request.getAttribute("factory5")%>"/></td>
+	   			<td><input type="text" name="money5" value="<%=request.getAttribute("money5")%>"/></td>
+	   			<td><input type="text" name="times5" value="<%=request.getAttribute("times5")%>"/></td>
+	   			<td><input type="text" name="totaltimes5" value="<%=request.getAttribute("totaltimes5")%>"/></td>
+	   			<td><input type="text" name="rmb5" value="<%=request.getAttribute("rmb5")%>"/></td>
+	   			<td><input type="hidden" name="conid5" value="<%=request.getAttribute("conid5")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno5"/></td>
+	   			<td><input type="text" name="factory5"/></td>
+	   			<td><input type="text" name="money5"/></td>
+	   			<td><input type="text" name="times5"/></td>
+	   			<td><input type="text" name="totaltimes5"/></td>
+	   			<td><input type="text" name="rmb5"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid6")!=null){
+	   				%>
+	   			<td><input type="text" name="purno6" value="<%=request.getAttribute("purno6")%>"/></td>
+	   			<td><input type="text" name="factory6" value="<%=request.getAttribute("factory6")%>"/></td>
+	   			<td><input type="text" name="money6" value="<%=request.getAttribute("money6")%>"/></td>
+	   			<td><input type="text" name="times6" value="<%=request.getAttribute("times6")%>"/></td>
+	   			<td><input type="text" name="totaltimes6" value="<%=request.getAttribute("totaltimes6")%>"/></td>
+	   			<td><input type="text" name="rmb6" value="<%=request.getAttribute("rmb6")%>"/></td>
+	   			<td><input type="hidden" name="conid6" value="<%=request.getAttribute("conid6")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno6"/></td>
+	   			<td><input type="text" name="factory6"/></td>
+	   			<td><input type="text" name="money6"/></td>
+	   			<td><input type="text" name="times6"/></td>
+	   			<td><input type="text" name="totaltimes6"/></td>
+	   			<td><input type="text" name="rmb6"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid7")!=null){
+	   				%>
+	   			<td><input type="text" name="purno7" value="<%=request.getAttribute("purno7")%>"/></td>
+	   			<td><input type="text" name="factory7" value="<%=request.getAttribute("factory7")%>"/></td>
+	   			<td><input type="text" name="money7" value="<%=request.getAttribute("money7")%>"/></td>
+	   			<td><input type="text" name="times7" value="<%=request.getAttribute("times7")%>"/></td>
+	   			<td><input type="text" name="totaltimes7" value="<%=request.getAttribute("totaltimes7")%>"/></td>
+	   			<td><input type="text" name="rmb7" value="<%=request.getAttribute("rmb7")%>"/></td>
+	   			<td><input type="hidden" name="conid7" value="<%=request.getAttribute("conid7")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno7"/></td>
+	   			<td><input type="text" name="factory7"/></td>
+	   			<td><input type="text" name="money7"/></td>
+	   			<td><input type="text" name="times7"/></td>
+	   			<td><input type="text" name="totaltimes7"/></td>
+	   			<td><input type="text" name="rmb7"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid8")!=null){
+	   				%>
+	   			<td><input type="text" name="purno8" value="<%=request.getAttribute("purno8")%>"/></td>
+	   			<td><input type="text" name="factory8" value="<%=request.getAttribute("factory8")%>"/></td>
+	   			<td><input type="text" name="money8" value="<%=request.getAttribute("money8")%>"/></td>
+	   			<td><input type="text" name="times8" value="<%=request.getAttribute("times8")%>"/></td>
+	   			<td><input type="text" name="totaltimes8" value="<%=request.getAttribute("totaltimes8")%>"/></td>
+	   			<td><input type="text" name="rmb8" value="<%=request.getAttribute("rmb8")%>"/></td>
+	   			<td><input type="hidden" name="conid8" value="<%=request.getAttribute("conid8")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno8"/></td>
+	   			<td><input type="text" name="factory8"/></td>
+	   			<td><input type="text" name="money8"/></td>
+	   			<td><input type="text" name="times8"/></td>
+	   			<td><input type="text" name="totaltimes8"/></td>
+	   			<td><input type="text" name="rmb8"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid9")!=null){
+	   				%>
+	   			<td><input type="text" name="purno9" value="<%=request.getAttribute("purno9")%>"/></td>
+	   			<td><input type="text" name="factory9" value="<%=request.getAttribute("factory9")%>"/></td>
+	   			<td><input type="text" name="money9" value="<%=request.getAttribute("money9")%>"/></td>
+	   			<td><input type="text" name="times9" value="<%=request.getAttribute("times9")%>"/></td>
+	   			<td><input type="text" name="totaltimes9" value="<%=request.getAttribute("totaltimes9")%>"/></td>
+	   			<td><input type="text" name="rmb9" value="<%=request.getAttribute("rmb9")%>"/></td>
+	   			<td><input type="hidden" name="conid9" value="<%=request.getAttribute("conid9")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno9"/></td>
+	   			<td><input type="text" name="factory9"/></td>
+	   			<td><input type="text" name="money9"/></td>
+	   			<td><input type="text" name="times9"/></td>
+	   			<td><input type="text" name="totaltimes9"/></td>
+	   			<td><input type="text" name="rmb9"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr><%
+	   			if(request.getAttribute("conid10")!=null){
+	   				%>
+	   			<td><input type="text" name="purno10" value="<%=request.getAttribute("purno10")%>"/></td>
+	   			<td><input type="text" name="factory10" value="<%=request.getAttribute("factory10")%>"/></td>
+	   			<td><input type="text" name="money10" value="<%=request.getAttribute("money10")%>"/></td>
+	   			<td><input type="text" name="times10" value="<%=request.getAttribute("times10")%>"/></td>
+	   			<td><input type="text" name="totaltimes10" value="<%=request.getAttribute("totaltimes10")%>"/></td>
+	   			<td><input type="text" name="rmb10" value="<%=request.getAttribute("rmb10")%>"/></td>
+	   			<td><input type="hidden" name="conid10" value="<%=request.getAttribute("conid10")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input type="text" name="purno10"/></td>
+	   			<td><input type="text" name="factory10"/></td>
+	   			<td><input type="text" name="money10"/></td>
+	   			<td><input type="text" name="times10"/></td>
+	   			<td><input type="text" name="totaltimes10"/></td>
+	   			<td><input type="text" name="rmb10"/></td>
+		   		<%} %>
+	   		</tr>
+	   		
+	   	</table>
+	   	<br/>
+	   	希望出口日期:<input name="hopeDate" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("hopeDate")%>"/>
+	   	预计工厂可送仓日期:<input name="estimateDate" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("estimateDate")%>"/>
+	   	<br/>
+	   	
+	   	交易方式 Term:<input name="transaction1" type="text" value="<%=request.getAttribute("transaction1")%>"/>
+	   	货运方式 :<input type="radio" name="transaction2" value="海运">海运
+				<input type="radio" name="transaction2" value="陆运">陆运
+				<input type="radio" name="transaction2" value="空运">空运
+				<input type="radio" name="transaction2" value="快递">快递
+	   	<br/>
+	   	总体积(CBM):<input name="volume" type="text" value="<%=request.getAttribute("volume")%>"/>
+	   	总毛重 G.W(KGS):<input name="totalGW" type="text" value="<%=request.getAttribute("totalGW")%>"/>
+	   	总净总 N.W(KGS): <input name="totalNW" type="text" value="<%=request.getAttribute("totalNW")%>"/>
+	   	<br/>
+	   	
+	   	From:<input name="fromwhere" type="text" value="<%=request.getAttribute("fromwhere")%>"/>
+	   	To:<input name="towhere" type="text" value="<%=request.getAttribute("towhere")%>"/>
+	   	<br/>
+	   	Package 包装类型:<input name="package" type="text" value="<%=request.getAttribute("package")%>"/>
+	   	Package 包装数量:<input name="packageNum" type="text" value="<%=request.getAttribute("packageNum")%>"/>
+	   	<br/>
+	   	支付币种：<input type="radio" name="currency" value="USD">美元
+				<input type="radio" name="currency" value="EUR">欧元
+				<input type="radio" name="currency" value="GBP">英镑
+				<input type="radio" name="currency" value="RMB">人民币
+				<input type="radio" name="currency" value="AUD">澳元
+	   	<br/>
+	   
+	   	<br/>
+	   托盘/木箱尺寸：<input name="palletDimension" type="text" value="<%=request.getAttribute("palletDimension")%>">	<br/>
+	   小箱件数(美国货必填)：<input name="casketQuantity" type="number" value="<%=request.getAttribute("casketQuantity")%>">	<br/>
+	   订框箱型：<select name="casketType">
+			   <option></option>
+			   <option <c:if test="${casketType eq '40尺高柜'}">selected</c:if>>40尺高柜</option>
+			   <option <c:if test="${casketType eq '40尺平柜'}">selected</c:if>>40尺平柜</option>
+			   <option <c:if test="${casketType eq '20尺柜'}">selected</c:if>>20尺柜</option>
+			   <option <c:if test="${casketType eq '拼箱'}">selected</c:if>>拼箱</option>
+			   <option <c:if test="${casketType eq '特殊柜'}">selected</c:if>>特殊柜</option>
+			 </select>  <br/>
+	  特殊要求备注(用&ltbr&gt换行)：<textarea name="detailed" cols="45" rows="5"><%=request.getAttribute("detailed")%></textarea>
+	   	<br/>
+	   	<table border="1">
+	   		<tr>
+	   			<td width="80px">Item英文名</td>
+	   			<td width="80px">Item中文名</td>
+			    <td width="80px">Quantity(请只填数字)</td>
+			    <td width="80px"><strong>采购价 总价(只填数字 单位:RMB)</strong></td>
+			    <td width="80px">Unit Price</td>
+			    <td width="80px">清关总价</td>
+			    <td width="80px">Shipping Mark</td>
+			    <td width="80px"><p>N.W.(请只填数字 单位:kg)</p></td>
+			    <td width="80px">实际报关总价（会计填）</td>
+			    <td width="150px">HS Code （物流填）</td>
+			    <td width="80px">退税率 （物流填）</td>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid1")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng1" value="<%=request.getAttribute("itemeng1")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn1" value="<%=request.getAttribute("itemchn1")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity1" value="<%=request.getAttribute("quantity1")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice1" value="<%=request.getAttribute("purprice1")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice1" value="<%=request.getAttribute("unitprice1")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall1" value="<%=request.getAttribute("unitpriceall1")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark1" value="<%=request.getAttribute("shopingmark1")%>"/></td>
+	   			<td><input size="10" type="text" name="nw1" value="<%=request.getAttribute("nw1")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice1" value="<%=request.getAttribute("trueprice1")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode1" value="<%=request.getAttribute("hscode1")%>"/></td>
+	   			<td><input size="10" type="text" name="rate1" value="<%=request.getAttribute("rate1")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid1" value="<%=request.getAttribute("itemid1")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng1"/></td>
+	   			<td><input size="10" type="text" name="itemchn1"/></td>
+	   			<td><input size="10" type="text" name="quantity1"/></td>
+	   			<td><input size="10" type="text" name="purprice1"/></td>
+	   			<td><input size="10" type="text" name="unitprice1"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall1"/></td>
+	   			<td><input size="10" type="text" name="shopingmark1" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw1"/></td>
+	   			<td><input size="10" type="text" name="trueprice1"/></td>
+	   			<td><input size="20" type="text" name="hscode1"/></td>
+	   			<td><input size="10" type="text" name="rate1"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid2")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng2" value="<%=request.getAttribute("itemeng2")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn2" value="<%=request.getAttribute("itemchn2")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity2" value="<%=request.getAttribute("quantity2")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice2" value="<%=request.getAttribute("purprice2")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice2" value="<%=request.getAttribute("unitprice2")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall2" value="<%=request.getAttribute("unitpriceall2")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark2" value="<%=request.getAttribute("shopingmark2")%>"/></td>
+	   			<td><input size="10" type="text" name="nw2" value="<%=request.getAttribute("nw2")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice2" value="<%=request.getAttribute("trueprice2")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode2" value="<%=request.getAttribute("hscode2")%>"/></td>
+	   			<td><input size="10" type="text" name="rate2" value="<%=request.getAttribute("rate2")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid2" value="<%=request.getAttribute("itemid2")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng2"/></td>
+	   			<td><input size="10" type="text" name="itemchn2"/></td>
+	   			<td><input size="10" type="text" name="quantity2"/></td>
+	   			<td><input size="10" type="text" name="purprice2"/></td>
+	   			<td><input size="10" type="text" name="unitprice2"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall2"/></td>
+	   			<td><input size="10" type="text" name="shopingmark2" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw2"/></td>
+	   			<td><input size="10" type="text" name="trueprice2"/></td>
+	   			<td><input size="20" type="text" name="hscode2"/></td>
+	   			<td><input size="10" type="text" name="rate2"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid3")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng3" value="<%=request.getAttribute("itemeng3")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn3" value="<%=request.getAttribute("itemchn3")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity3" value="<%=request.getAttribute("quantity3")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice3" value="<%=request.getAttribute("purprice3")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice3" value="<%=request.getAttribute("unitprice3")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall3" value="<%=request.getAttribute("unitpriceall3")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark3" value="<%=request.getAttribute("shopingmark3")%>"/></td>
+	   			<td><input size="10" type="text" name="nw3" value="<%=request.getAttribute("nw3")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice3" value="<%=request.getAttribute("trueprice3")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode3" value="<%=request.getAttribute("hscode3")%>"/></td>
+	   			<td><input size="10" type="text" name="rate3" value="<%=request.getAttribute("rate3")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid3" value="<%=request.getAttribute("itemid3")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng3"/></td>
+	   			<td><input size="10" type="text" name="itemchn3"/></td>
+	   			<td><input size="10" type="text" name="quantity3"/></td>
+	   			<td><input size="10" type="text" name="purprice3"/></td>
+	   			<td><input size="10" type="text" name="unitprice3"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall2"/></td>
+	   			<td><input size="10" type="text" name="shopingmark3" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw3"/></td>
+	   			<td><input size="10" type="text" name="trueprice3"/></td>
+	   			<td><input size="20" type="text" name="hscode3"/></td>
+	   			<td><input size="10" type="text" name="rate3"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid4")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng4" value="<%=request.getAttribute("itemeng4")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn4" value="<%=request.getAttribute("itemchn4")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity4" value="<%=request.getAttribute("quantity4")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice4" value="<%=request.getAttribute("purprice4")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice4" value="<%=request.getAttribute("unitprice4")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall4" value="<%=request.getAttribute("unitpriceall4")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark4" value="<%=request.getAttribute("shopingmark4")%>"/></td>
+	   			<td><input size="10" type="text" name="nw4" value="<%=request.getAttribute("nw4")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice4" value="<%=request.getAttribute("trueprice4")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode4" value="<%=request.getAttribute("hscode4")%>"/></td>
+	   			<td><input size="10" type="text" name="rate4" value="<%=request.getAttribute("rate4")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid4" value="<%=request.getAttribute("itemid4")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng4"/></td>
+	   			<td><input size="10" type="text" name="itemchn4"/></td>
+	   			<td><input size="10" type="text" name="quantity4"/></td>
+	   			<td><input size="10" type="text" name="purprice4"/></td>
+	   			<td><input size="10" type="text" name="unitprice4"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall4"/></td>
+	   			<td><input size="10" type="text" name="shopingmark4" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw4"/></td>
+	   			<td><input size="10" type="text" name="trueprice4"/></td>
+	   			<td><input size="20" type="text" name="hscode4"/></td>
+	   			<td><input size="10" type="text" name="rate4"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid5")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng5" value="<%=request.getAttribute("itemeng5")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn5" value="<%=request.getAttribute("itemchn5")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity5" value="<%=request.getAttribute("quantity5")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice5" value="<%=request.getAttribute("purprice5")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice5" value="<%=request.getAttribute("unitprice5")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall5" value="<%=request.getAttribute("unitpriceall5")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark5" value="<%=request.getAttribute("shopingmark5")%>"/></td>
+	   			<td><input size="10" type="text" name="nw5" value="<%=request.getAttribute("nw5")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice5" value="<%=request.getAttribute("trueprice5")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode5" value="<%=request.getAttribute("hscode5")%>"/></td>
+	   			<td><input size="10" type="text" name="rate5" value="<%=request.getAttribute("rate5")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid5" value="<%=request.getAttribute("itemid5")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng5"/></td>
+	   			<td><input size="10" type="text" name="itemchn5"/></td>
+	   			<td><input size="10" type="text" name="quantity5"/></td>
+	   			<td><input size="10" type="text" name="purprice5"/></td>
+	   			<td><input size="10" type="text" name="unitprice5"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall5"/></td>
+	   			<td><input size="10" type="text" name="shopingmark5" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw5"/></td>
+	   			<td><input size="10" type="text" name="trueprice5"/></td>
+	   			<td><input size="20" type="text" name="hscode5"/></td>
+	   			<td><input size="10" type="text" name="rate5"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid6")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng6" value="<%=request.getAttribute("itemeng6")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn6" value="<%=request.getAttribute("itemchn6")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity6" value="<%=request.getAttribute("quantity6")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice6" value="<%=request.getAttribute("purprice6")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice6" value="<%=request.getAttribute("unitprice6")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall6" value="<%=request.getAttribute("unitpriceall6")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark6" value="<%=request.getAttribute("shopingmark6")%>"/></td>
+	   			<td><input size="10" type="text" name="nw6" value="<%=request.getAttribute("nw6")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice6" value="<%=request.getAttribute("trueprice6")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode6" value="<%=request.getAttribute("hscode6")%>"/></td>
+	   			<td><input size="10" type="text" name="rate6" value="<%=request.getAttribute("rate6")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid6" value="<%=request.getAttribute("itemid6")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng6"/></td>
+	   			<td><input size="10" type="text" name="itemchn6"/></td>
+	   			<td><input size="10" type="text" name="quantity6"/></td>
+	   			<td><input size="10" type="text" name="purprice6"/></td>
+	   			<td><input size="10" type="text" name="unitprice6"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall6"/></td>
+	   			<td><input size="10" type="text" name="shopingmark6" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw6"/></td>
+	   			<td><input size="10" type="text" name="trueprice6"/></td>
+	   			<td><input size="20" type="text" name="hscode6"/></td>
+	   			<td><input size="10" type="text" name="rate6"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid7")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng7" value="<%=request.getAttribute("itemeng7")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn7" value="<%=request.getAttribute("itemchn7")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity7" value="<%=request.getAttribute("quantity7")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice7" value="<%=request.getAttribute("purprice7")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice7" value="<%=request.getAttribute("unitprice7")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall7" value="<%=request.getAttribute("unitpriceall7")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark7" value="<%=request.getAttribute("shopingmark7")%>"/></td>
+	   			<td><input size="10" type="text" name="nw7" value="<%=request.getAttribute("nw7")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice7" value="<%=request.getAttribute("trueprice7")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode7" value="<%=request.getAttribute("hscode7")%>"/></td>
+	   			<td><input size="10" type="text" name="rate7" value="<%=request.getAttribute("rate7")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid7" value="<%=request.getAttribute("itemid7")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng7"/></td>
+	   			<td><input size="10" type="text" name="itemchn7"/></td>
+	   			<td><input size="10" type="text" name="quantity7"/></td>
+	   			<td><input size="10" type="text" name="purprice7"/></td>
+	   			<td><input size="10" type="text" name="unitprice7"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall7"/></td>
+	   			<td><input size="10" type="text" name="shopingmark7" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw7"/></td>
+	   			<td><input size="10" type="text" name="trueprice7"/></td>
+	   			<td><input size="20" type="text" name="hscode7"/></td>
+	   			<td><input size="10" type="text" name="rate7"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid8")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng8" value="<%=request.getAttribute("itemeng8")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn8" value="<%=request.getAttribute("itemchn8")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity8" value="<%=request.getAttribute("quantity8")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice8" value="<%=request.getAttribute("purprice8")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice8" value="<%=request.getAttribute("unitprice8")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall8" value="<%=request.getAttribute("unitpriceall8")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark8" value="<%=request.getAttribute("shopingmark8")%>"/></td>
+	   			<td><input size="10" type="text" name="nw8" value="<%=request.getAttribute("nw8")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice8" value="<%=request.getAttribute("trueprice8")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode8" value="<%=request.getAttribute("hscode8")%>"/></td>
+	   			<td><input size="10" type="text" name="rate8" value="<%=request.getAttribute("rate8")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid8" value="<%=request.getAttribute("itemid8")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng8"/></td>
+	   			<td><input size="10" type="text" name="itemchn8"/></td>
+	   			<td><input size="10" type="text" name="quantity8"/></td>
+	   			<td><input size="10" type="text" name="purprice8"/></td>
+	   			<td><input size="10" type="text" name="unitprice8"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall8"/></td>
+	   			<td><input size="10" type="text" name="shopingmark8" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw8"/></td>
+	   			<td><input size="10" type="text" name="trueprice8"/></td>
+	   			<td><input size="20" type="text" name="hscode8"/></td>
+	   			<td><input size="10" type="text" name="rate8"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid9")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng9" value="<%=request.getAttribute("itemeng9")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn9" value="<%=request.getAttribute("itemchn9")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity9" value="<%=request.getAttribute("quantity9")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice9" value="<%=request.getAttribute("purprice9")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice9" value="<%=request.getAttribute("unitprice9")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall9" value="<%=request.getAttribute("unitpriceall9")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark9" value="<%=request.getAttribute("shopingmark9")%>"/></td>
+	   			<td><input size="10" type="text" name="nw9" value="<%=request.getAttribute("nw9")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice9" value="<%=request.getAttribute("trueprice9")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode9" value="<%=request.getAttribute("hscode9")%>"/></td>
+	   			<td><input size="10" type="text" name="rate9" value="<%=request.getAttribute("rate9")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid9" value="<%=request.getAttribute("itemid9")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng9"/></td>
+	   			<td><input size="10" type="text" name="itemchn9"/></td>
+	   			<td><input size="10" type="text" name="quantity9"/></td>
+	   			<td><input size="10" type="text" name="purprice9"/></td>
+	   			<td><input size="10" type="text" name="unitprice9"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall9"/></td>
+	   			<td><input size="10" type="text" name="shopingmark9" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw9"/></td>
+	   			<td><input size="10" type="text" name="trueprice9"/></td>
+	   			<td><input size="20" type="text" name="hscode9"/></td>
+	   			<td><input size="10" type="text" name="rate9"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid10")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng10" value="<%=request.getAttribute("itemeng10")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn10" value="<%=request.getAttribute("itemchn10")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity10" value="<%=request.getAttribute("quantity10")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice10" value="<%=request.getAttribute("purprice10")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice10" value="<%=request.getAttribute("unitprice10")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall10" value="<%=request.getAttribute("unitpriceall10")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark10" value="<%=request.getAttribute("shopingmark10")%>"/></td>
+	   			<td><input size="10" type="text" name="nw10" value="<%=request.getAttribute("nw10")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice10" value="<%=request.getAttribute("trueprice10")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode10" value="<%=request.getAttribute("hscode10")%>"/></td>
+	   			<td><input size="10" type="text" name="rate10" value="<%=request.getAttribute("rate10")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid10" value="<%=request.getAttribute("itemid10")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng10"/></td>
+	   			<td><input size="10" type="text" name="itemchn10"/></td>
+	   			<td><input size="10" type="text" name="quantity10"/></td>
+	   			<td><input size="10" type="text" name="purprice10"/></td>
+	   			<td><input size="10" type="text" name="unitprice10"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall10"/></td>
+	   			<td><input size="10" type="text" name="shopingmark10" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw10"/></td>
+	   			<td><input size="10" type="text" name="trueprice10"/></td>
+	   			<td><input size="20" type="text" name="hscode10"/></td>
+	   			<td><input size="10" type="text" name="rate10"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid11")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng11" value="<%=request.getAttribute("itemeng11")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn11" value="<%=request.getAttribute("itemchn11")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity11" value="<%=request.getAttribute("quantity11")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice11" value="<%=request.getAttribute("purprice11")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice11" value="<%=request.getAttribute("unitprice11")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall11" value="<%=request.getAttribute("unitpriceall11")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark11" value="<%=request.getAttribute("shopingmark11")%>"/></td>
+	   			<td><input size="10" type="text" name="nw11" value="<%=request.getAttribute("nw11")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice11" value="<%=request.getAttribute("trueprice11")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode11" value="<%=request.getAttribute("hscode11")%>"/></td>
+	   			<td><input size="10" type="text" name="rate11" value="<%=request.getAttribute("rate11")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid11" value="<%=request.getAttribute("itemid11")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng11"/></td>
+	   			<td><input size="10" type="text" name="itemchn11"/></td>
+	   			<td><input size="10" type="text" name="quantity11"/></td>
+	   			<td><input size="10" type="text" name="purprice11"/></td>
+	   			<td><input size="10" type="text" name="unitprice11"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall11"/></td>
+	   			<td><input size="10" type="text" name="shopingmark11" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw11"/></td>
+	   			<td><input size="10" type="text" name="trueprice11"/></td>
+	   			<td><input size="20" type="text" name="hscode11"/></td>
+	   			<td><input size="10" type="text" name="rate11"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid12")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng12" value="<%=request.getAttribute("itemeng12")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn12" value="<%=request.getAttribute("itemchn12")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity12" value="<%=request.getAttribute("quantity12")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice12" value="<%=request.getAttribute("purprice12")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice12" value="<%=request.getAttribute("unitprice12")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall12" value="<%=request.getAttribute("unitpriceall12")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark12" value="<%=request.getAttribute("shopingmark12")%>"/></td>
+	   			<td><input size="10" type="text" name="nw12" value="<%=request.getAttribute("nw12")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice12" value="<%=request.getAttribute("trueprice12")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode12" value="<%=request.getAttribute("hscode12")%>"/></td>
+	   			<td><input size="10" type="text" name="rate12" value="<%=request.getAttribute("rate12")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid12" value="<%=request.getAttribute("itemid12")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng12"/></td>
+	   			<td><input size="10" type="text" name="itemchn12"/></td>
+	   			<td><input size="10" type="text" name="quantity12"/></td>
+	   			<td><input size="10" type="text" name="purprice12"/></td>
+	   			<td><input size="10" type="text" name="unitprice12"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall12"/></td>
+	   			<td><input size="10" type="text" name="shopingmark12" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw12"/></td>
+	   			<td><input size="10" type="text" name="trueprice12"/></td>
+	   			<td><input size="20" type="text" name="hscode12"/></td>
+	   			<td><input size="10" type="text" name="rate12"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid13")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng13" value="<%=request.getAttribute("itemeng13")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn13" value="<%=request.getAttribute("itemchn13")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity13" value="<%=request.getAttribute("quantity13")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice13" value="<%=request.getAttribute("purprice13")%>"/></td>
+	   			<td><input size="10" type="text" name="unitprice13" value="<%=request.getAttribute("unitprice13")%>"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall13" value="<%=request.getAttribute("unitpriceall13")%>"/></td>
+	   			<td><input size="10" type="text" name="shopingmark13" value="<%=request.getAttribute("shopingmark13")%>"/></td>
+	   			<td><input size="10" type="text" name="nw13" value="<%=request.getAttribute("nw13")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice13" value="<%=request.getAttribute("trueprice13")%>"/></td>
+	   			<td><input size="20" type="text" name="hscode13" value="<%=request.getAttribute("hscode13")%>"/></td>
+	   			<td><input size="10" type="text" name="rate13" value="<%=request.getAttribute("rate13")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid13" value="<%=request.getAttribute("itemid13")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng13"/></td>
+	   			<td><input size="10" type="text" name="itemchn13"/></td>
+	   			<td><input size="10" type="text" name="quantity13"/></td>
+	   			<td><input size="10" type="text" name="purprice13"/></td>
+	   			<td><input size="10" type="text" name="unitprice13"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall13"/></td>
+	   			<td><input size="10" type="text" name="shopingmark13" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw13"/></td>
+	   			<td><input size="10" type="text" name="trueprice13"/></td>
+	   			<td><input size="20" type="text" name="hscode13"/></td>
+	   			<td><input size="10" type="text" name="rate13"/></td>
+		   		<%} %>
+	   		</tr>
+	   	</table>
+	   	<br/>
+	   	指定货代(如果有)(用&ltbr&gt换行)：<textarea name="frieght"  cols="45" rows="5"><%=request.getAttribute("frieght")%></textarea>
+	   	<br/>
+	   		*物流填写：报关发票号：<input name="Nonum" type="text" value="<%=request.getAttribute("Nonum")%>"/>
+	   	发票日期：<input name="date" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("date")%>"/></input>
+	   	sailing Date:<input name="saildate" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("saildate")%>"/>
+	   		<br/>
+	   	货代:<input name="huodai" type="text" value="<%=request.getAttribute("huodai")%>"/>
+	   	运费:<input name="yunfei" type="text" value="<%=request.getAttribute("yunfei")%>"/>(* FOB 无运费)
+	   	<br/>
+   	 	运费方式 :<input type="radio" name="yunfeifs" value="COLLECT"/>到付
+			<input type="radio" name="yunfeifs" value="PREPAID"/>预付
+			保费:<input name="premium" type="text" value="<%=request.getAttribute("premium")%>"/>
+			<br/>
+				<script type="text/javascript">
+		    window.onload = function(){
+		    var checked = '<%=request.getAttribute("currency")%>'
+		        var radios = document.getElementsByName('currency');
+		        var len = radios.length;
+		        for(var i=0;i<len;i++){
+		            if(checked==radios[i].value){
+		                radios[i].setAttribute('checked','checked');
+		            }
+		        }
+		       var checkedss='<%=request.getAttribute("transaction2")%>';
+		        var radioss = document.getElementsByName('transaction2');
+		        var lens = radioss.length;
+		        for(var j=0;j<lens;j++){
+		            if(checkedss==radioss[j].value){
+		                radioss[j].setAttribute('checked','checked');
+		            }
+		        }
+		        var checkedfs='<%=request.getAttribute("yunfeifs")%>';
+		        var radiofs = document.getElementsByName('yunfeifs');
+		        var lenfs = radiofs.length;
+		        for(var t=0;t<lenfs;t++){
+		            if(checkedfs==radiofs[t].value){
+		                radiofs[t].setAttribute('checked','checked');
+		            }
+		        }
+		    }
+		</script>
+   	</table>
+   <br/>
+   <input type="submit" value="保存"></input>
+   </form>
+  </body>
+</html>

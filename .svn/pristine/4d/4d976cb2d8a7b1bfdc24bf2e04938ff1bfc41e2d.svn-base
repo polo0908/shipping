@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//src/com/cynergy/listener/AccessFilter.java=UTF-8
+encoding//src/com/cynergy/server/InvoiceServlet.java=UTF-8
+encoding//src/com/cynergy/server/Login.java=UTF-8
+encoding//src/com/cynergy/server/SaveServlet.java=UTF-8
+encoding//src/com/cynergy/server/SummaryServlet.java=UTF-8
+encoding//src/com/cynergy/server/ToLogin.java=UTF-8
+encoding/<project>=UTF-8

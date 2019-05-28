@@ -1,0 +1,865 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>My JSP 'update.jsp' starting page</title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<script type="text/javascript" src="My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>	
+	
+	<style type="text/css">
+	
+	   #table1 input{
+	    width: 100%;
+	  }
+	       /*添加一行样式*/  
+       .p_add{
+        color:#ff4d09;
+       }           
+       .add{
+            margin-left: 63%;
+		    font-size: 30px;
+		    font-weight: 700;
+       }
+	
+	</style>
+	
+    <script type="text/javascript">
+  
+     $(function(){  
+	    /**
+	     *计算重量
+	     */
+	    $('.n_weight').blur(function(){
+	    	var totalNW = 0;
+	   	    $('.n_weight').each(function(i){
+	   	    	var weight = $(this).val();
+	   	    	if(isNaN(weight) || weight == "" || weight == undefined){
+	   	    		return true;
+	   	    	}else{
+	   	    		totalNW +=Number(weight);
+	   	    		$('#totalNW').val(Number(totalNW).toFixed(2));
+	   	    	}	   	    	
+	   	    })
+	   	    
+	    })
+	    
+	 }) 
+	 
+	 	 //验算出口人民币和采购价是否一致
+	    function update_order(){
+    	 
+    	    //获取总个数
+    	    var index = $('#table1').find('tr').length-1;
+    	    $('#totalSize').val(index);
+	    	
+	    	var totalExportPrice = 0;
+	    	var totalPurchasePrice = 0;
+	 
+	    	$('.export-cn').each(function(){
+	    		var exportPrice = $(this).val();
+	   	    	if(isNaN(exportPrice) || exportPrice == "" || exportPrice == undefined){
+	   	    		return true;
+	   	    	}else{
+	   	    		totalExportPrice +=Number(exportPrice);
+	   	    	}	
+	    	})
+	    	
+	    	
+	    	$('.export-cn1').each(function(){
+	    		var purchasePrice = $(this).val();
+	   	    	if(isNaN(purchasePrice) || purchasePrice == "" || purchasePrice == undefined){
+	   	    		return true;
+	   	    	}else{
+	   	    		totalPurchasePrice +=Number(purchasePrice);
+	   	    	}	   	    
+	    	})
+	    	
+	    	if(Number(totalExportPrice).toFixed(2) != Number(totalPurchasePrice).toFixed(2)){
+	    		alert("出口人民币和采购总价不一致！");
+	    		return false;
+	    	}	 
+	    	
+	    	$('.true-price').each(function(){
+	    		if(!($(this).val() == null || $(this).val() == '' || $(this).val() == undefined || $(this).val() == 0)){
+	    			var truePrice = $(this).val();
+	    			var colInput = $(this).parents('tr').find('.export-cn1').val();
+	    			var defaultVal = $(this).parents('tr').find('.export-cn1').attr('defaultValue');
+	    			if(colInput != defaultVal){
+	    				alert('采购价改变，请重新确认报关总价!');
+	    				var currency = $('#select_currency').val();
+	    				var exchange = 0.0;
+	    				if(currency == 'USD'){
+	    					exchange = Number(colInput)/Number(truePrice).toFixed(2);
+	    					if(exchange > 7){
+	    						$(this).val(0);
+	    					}
+	    				}
+	    				if(currency == 'GBP'){
+	    					exchange = Number(colInput)/Number(truePrice).toFixed(2);
+	    					if(exchange > 9){
+	    						$(this).val(0);
+	    					}
+	    				}
+	    				if(currency == 'EUR'){
+	    					exchange = Number(colInput)/Number(truePrice).toFixed(2);
+	    					if(exchange > 8){
+	    						$(this).val(0);
+	    					}
+	    				}
+	    				if(currency == 'AUD'){
+	    					exchange = Number(colInput)/Number(truePrice).toFixed(2);
+	    					if(exchange > 5.5){
+	    						$(this).val(0);
+	    					}
+	    				}
+	    				
+	    				
+	    			}
+	    		}
+	    	})
+	    
+	    	
+    	//验算毛重是否大于净重
+    	var totalGW = $('#totalGW').val();
+    	var totalNW = $('#totalNW').val();
+    	if(Number(totalGW) < Number(totalNW)){
+    		alert("毛重不能小于净重！");
+    		return false;
+    	} 	
+    	//验证净重是否相等
+     	var totalNWCal = 0;
+   	    $('.n_weight').each(function(i){
+   	    	var weight = $(this).val();
+   	    	if(isNaN(weight) || weight == "" || weight == undefined){
+   	    		return true;
+   	    	}else{
+   	    		totalNWCal +=Number(weight);
+   	    	}	   	    	
+   	    })
+   	    totalNWCal = Number(totalNWCal).toFixed(2);
+   	    totalNW =  Number(totalNW).toFixed(2);
+    	if(totalNW != totalNWCal){
+    		alert("净重不相等！");
+    		return false;
+    	}
+    	
+	    
+	    //验算清关总价是否等于数量*单价
+	    var flag = true;
+	    $('.unit-price-all').each(function(){	
+	    	  var priceAll = $(this).val(); 
+	    	  var quantity = $(this).parent().parent().find('input').eq(2).val();
+	    	  var unitPrice = $(this).parent().parent().find('input').eq(4).val();
+	    	  var calPrice = priceAll / quantity;
+	    	  if(isNaN(calPrice) || calPrice == "" || calPrice == undefined){
+	    		  if(unitPrice != ''){
+			    		alert("清关总价不等于数量*单价！");
+			    		flag = false;
+			    		return false;
+			    	}	 	    
+	    	  }else{
+	    		  if(Number(calPrice).toFixed(0) != Number(unitPrice).toFixed(0)){
+			    		alert("清关总价不等于数量*单价！");
+			    		flag = false;
+			    		return false;
+			    	}	 	    
+	    	  }    	  	  
+	      })  
+	    		    	
+// 	        if(!(flag)){
+// 	        	return false;	
+// 	        }
+	    
+		  //当输入起运和到港时间同步到CRM系统
+	    	var saildate = $('#saildate').val();
+	    	var arriveDate = $('#arriveDate').val();
+	    	var destinationPort = $('#destinationPort').val();
+	    	if(saildate != null && saildate != '' && saildate != undefined && arriveDate !=null && arriveDate != '' && arriveDate != undefined){
+	    		var orderIds = '';
+		    	$('.order-id').each(function(){
+		    		var order_id = $(this).val();
+		    		if(!(order_id == null || order_id == '' || order_id == undefined)){
+		    			var reg = /[a-zA-Z]/g;
+		    			order_id.replace(reg,"");
+		    			order_id = "SHS"+order_id.replace("合","");	    			
+		    			orderIds += order_id+',';
+		    		}
+		    	})
+		    	//同步运输数据
+		    	$.ajax({
+					type : "post",
+					datatype : "json",
+					url : "SyncShippingDateToCrmServlet",
+					data : {
+						"orderIds" : orderIds,
+						"saildate" : saildate,
+						"arriveDate" : arriveDate,
+						"destinationPort" : destinationPort
+					},
+					success : function(result) {
+						
+					},
+					error : function() {
+						
+					}
+				});
+	    	}           
+	    
+	    	
+	    	
+    	  if($('#contract_date').val() == null || $('#contract_date').val() == ''){
+	        	alert("请输入外销合同时间");
+	        	return false;
+	        }
+	    	
+	    	
+	        //判断运输国家是否为空
+	        var destinationPort = $('#destinationPort').val();
+	        if(destinationPort == null || destinationPort == ''){
+	        	alert('出运国家不能为空');
+	        	return false;
+	        }
+    	  
+	    	
+	    	$('#order_form').submit();   	
+	    
+     }
+	 
+	    /**
+	     *确认货币单元
+	     */
+	    function confirm_currency(obj){
+	    	var select_currency = $("#select_currency").val();
+	    	var currency = $(obj).val();
+ 		if (confirm("确认修改货币单位?")) {	  
+ 			$("#select_currency").val(currency);
+	    	}else{
+	    	  $(":radio[name='currency'][value='" + select_currency + "']").attr("checked",true);
+	    	}
+	    	
+	    }
+	    //合同输入table新增一行
+	       function addTr(){    	   
+	    	  $('#table1').append($('#table1').find('tr:last').clone()); 
+	    	  var index = $('#table1').find('tr').length-1;
+	    	  $('#table1').find('tr:last').find('input').each(function(){
+	    		   var name = $(this).attr('name');
+	    		   var num = name.replace(/[^0-9]/g, "");
+	    		   name = name.replace(num,index);
+	    		   $(this).attr('name',name);
+	    	  })
+	    	  $('#table1').find('tr:last').find('td:last').find('input:first').val('');
+	    	  $('#totalSize').val(index);
+	       }
+	 
+  </script>
+  </head>
+  <body>	
+  <h1>修改出运单</h1>
+   <form action="UpdateServlet" method="post" onsubmit="return false;" id="order_form">
+   	<table border="1">
+   	  <tr>
+	   	  <td>
+	   	    <input type="hidden" id="totalSize" name="totalSize" value="10">
+	   	    <input type="hidden" id="select_currency"  value="${currency}">
+	   		<input type="text" name="id" style="display:none;" value="<%=request.getAttribute("id")%>"/>
+	   		采购：<input name="purchase" type="text" value="<%=request.getAttribute("purchase")%>"/>
+	   		销售：<input name="sale" type="text" value="<%=request.getAttribute("sale")%>"/>
+	   		客户名：<input name="clientName" type="text" value="<%=request.getAttribute("clientName")%>"/>
+		   	<br/>
+		   	<c:if test="${attrSource == 1 && sessionScope.auth == 1}">
+		   	收货人地址(用&ltbr&gt换行)：<textarea name="address" cols="45" rows="5"><%=request.getAttribute("address")%></textarea>
+		   	<br/>
+		   	</c:if>
+		   	<c:if test="${attrSource == 0}">
+		   	收货人地址(用&ltbr&gt换行)：<textarea name="address" cols="45" rows="5"><%=request.getAttribute("address")%></textarea>
+		   	<br/>
+		   	</c:if>
+		   	</td>
+	  </tr>
+	</table>
+	   	<table border="1" id="table1">
+	   		<tr>
+	   			<td>采购合同号(格式：合10000-1A)</td>
+	   			<td>工厂名称</td>
+	   			<td>合同金额(格式：100000.00)</td>
+	   			<td>第几次出货批次</td>
+	   			<td>总共几次出货批次</td>
+	   			<td>本次出口人民币金额(格式：100000.00)</td>
+	   		</tr>	 
+	   			
+   					<%
+   				    Integer totalSize = Integer.parseInt(request.getAttribute("totalSize").toString());
+   			        for(int i=0;i<totalSize;i++){
+   			    	%>
+   			    	 <tr>
+	   			    	<td><input type="text" name="purno<%=i+1%>" class="order-id" value="<%=request.getAttribute("purno"+(i+1))%>"/></td>
+			   			<td><input type="text" name="factory<%=i+1%>" value="<%=request.getAttribute("factory"+(i+1))%>"/></td>
+			   			<td><input type="text" name="money<%=i+1%>" value="<%=request.getAttribute("money"+(i+1))%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+			   			<td><input type="text" name="times<%=i+1%>" value="<%=request.getAttribute("times"+(i+1))%>"/></td>
+			   			<td><input type="text" name="totaltimes<%=i+1%>" value="<%=request.getAttribute("totaltimes"+(i+1))%>"/></td>
+			   			<td><input type="text" name="rmb<%=i+1%>" class="export-cn" value="<%=request.getAttribute("rmb"+(i+1))%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+			   			<td><input type="hidden" name="conid<%=i+1%>" value="<%=request.getAttribute("conid"+(i+1))%>"/></td>  
+	   			     </tr>
+	   			    <% 	  
+	   			      }
+	   				%>	
+	   			
+	   		
+	   	</table>
+	   	<p class="p_add"><span class="add" onclick="addTr()">+</span><span onclick="addTr()">(添加一行)</span></p>
+	   	希望出口日期:<input name="hopeDate" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("hopeDate")%>"/>
+	   	预计工厂可送仓日期:<input name="estimateDate" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("estimateDate")%>"/>
+	   	<br/>
+	   	
+	   	交易方式 Term:<input name="transaction1" type="text" value="<%=request.getAttribute("transaction1")%>"/>
+	   	货运方式 :<input type="radio" name="transaction2" value="海运">海运
+				<input type="radio" name="transaction2" value="陆运">陆运
+				<input type="radio" name="transaction2" value="空运">空运
+				<input type="radio" name="transaction2" value="快递">快递
+	   	<br/>
+	   	总体积(CBM):<input name="volume" type="text" value="<%=request.getAttribute("volume")%>"/>
+	   	总毛重 G.W(KGS):<input name="totalGW" type="text" id="totalGW" value="<%=request.getAttribute("totalGW")%>"/>
+	   	总净重 N.W(KGS): <input name="totalNW" type="text" id="totalNW" value="<%=request.getAttribute("totalNW")%>"/>
+	   	<br/>
+	   	
+	   	From:<input name="fromwhere" type="text" value="<%=request.getAttribute("fromwhere")%>"/>
+	   	To:<input name="towhere" id="destinationPort" type="text" value="<%=request.getAttribute("towhere")%>"/>
+	   	<br/>
+	   	Package 包装类型:<input name="package" type="text" value="<%=request.getAttribute("package")%>"/>
+	   	Package 包装数量:<input name="packageNum" type="text" value="<%=request.getAttribute("packageNum")%>"/>
+	   	<br/>
+	   	支付币种：
+	   	        
+	   	        <input type="radio" name="currency" value="USD" onchange="confirm_currency(this)">美元
+				<input type="radio" name="currency" value="EUR" onchange="confirm_currency(this)">欧元
+				<input type="radio" name="currency" value="GBP" onchange="confirm_currency(this)">英镑
+				<input type="radio" name="currency" value="RMB" onchange="confirm_currency(this)">人民币
+				<input type="radio" name="currency" value="AUD" onchange="confirm_currency(this)">澳元
+	   	<br/>
+	   
+	   	<br/>
+	    托盘/木箱尺寸：<input name="palletDimension" type="text" value="<%=request.getAttribute("palletDimension")%>">	<br/>
+	   小箱件数(美国货必填)：<input name="casketQuantity" type="number" value="<%=request.getAttribute("casketQuantity")%>">	<br/>
+	   订框箱型：<select name="casketType">
+			   <option></option>
+			   <option <c:if test="${casketType eq '40尺高柜'}">selected</c:if>>40尺高柜</option>
+			   <option <c:if test="${casketType eq '40尺平柜'}">selected</c:if>>40尺平柜</option>
+			   <option <c:if test="${casketType eq '20尺柜'}">selected</c:if>>20尺柜</option>
+			   <option <c:if test="${casketType eq '拼箱'}">selected</c:if>>拼箱</option>
+			   <option <c:if test="${casketType eq '特殊柜'}">selected</c:if>>特殊柜</option>
+			 </select>  
+	 <br/><br/>
+	  特殊要求备注(用&ltbr&gt换行)：<textarea name="detailed" cols="45" rows="5"><%=request.getAttribute("detailed")%></textarea>
+	   	<br/>
+	   	<table border="1">
+	   		<tr>
+	   			<td width="80px">Item英文名</td>
+	   			<td width="80px">Item中文名</td>
+			    <td width="80px">Quantity(请只填数字)</td>
+			    <td width="80px"><strong>采购价 总价(只填数字 单位:RMB)(格式：100000.00)</strong></td>
+			    <td width="80px">Unit Price(对外销售单价)</td>
+			    <td width="80px">(客户)清关总价(格式：100000.00)</td>
+			    <td width="80px">Shipping Mark</td>
+			    <td width="80px"><p>N.W.(请只填数字 单位:kg)</p></td>
+			    <td width="80px">实际报关总价(会计填)(格式：100000.00)</td>
+			    <td width="150px">HS Code (物流填)</td>
+			    <td width="80px">退税率 (物流填 *%)</td>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid1")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng1" value="<%=request.getAttribute("itemeng1")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn1" value="<%=request.getAttribute("itemchn1")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity1" value="<%=request.getAttribute("quantity1")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice1" class="export-cn1" value="<%=request.getAttribute("purprice1")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice1" value="<%=request.getAttribute("unitprice1")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall1" class="unit-price-all" value="<%=request.getAttribute("unitpriceall1")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark1" value="<%=request.getAttribute("shopingmark1")%>"/></td>
+	   			<td><input size="10" type="text" name="nw1" class="n_weight" value="<%=request.getAttribute("nw1")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice1" class="true-price" value="<%=request.getAttribute("trueprice1")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode1" value="<%=request.getAttribute("hscode1")%>"/></td>
+	   			<td><input size="10" type="text" name="rate1" value="<%=request.getAttribute("rate1")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid1" value="<%=request.getAttribute("itemid1")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng1"/></td>
+	   			<td><input size="10" type="text" name="itemchn1"/></td>
+	   			<td><input size="10" type="text" name="quantity1"/></td>
+	   			<td><input size="10" type="text" name="purprice1" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall1" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark1" value="N/M"/></td>
+	   			<td><input size="10" type="text" class="n_weight" name="nw1"/></td>
+	   			<td><input size="10" type="text" name="trueprice1" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode1"/></td>
+	   			<td><input size="10" type="text" name="rate1"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid2")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng2" value="<%=request.getAttribute("itemeng2")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn2" value="<%=request.getAttribute("itemchn2")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity2" value="<%=request.getAttribute("quantity2")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice2" class="export-cn1" value="<%=request.getAttribute("purprice2")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice2" value="<%=request.getAttribute("unitprice2")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall2" class="unit-price-all" value="<%=request.getAttribute("unitpriceall2")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark2" value="<%=request.getAttribute("shopingmark2")%>"/></td>
+	   			<td><input size="10" type="text" name="nw2" class="n_weight" value="<%=request.getAttribute("nw2")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice2" class="true-price" value="<%=request.getAttribute("trueprice2")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode2" value="<%=request.getAttribute("hscode2")%>"/></td>
+	   			<td><input size="10" type="text" name="rate2" value="<%=request.getAttribute("rate2")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid2" value="<%=request.getAttribute("itemid2")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng2"/></td>
+	   			<td><input size="10" type="text" name="itemchn2"/></td>
+	   			<td><input size="10" type="text" name="quantity2"/></td>
+	   			<td><input size="10" type="text" name="purprice2" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice2" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall2" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark2" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw2" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice2" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode2"/></td>
+	   			<td><input size="10" type="text" name="rate2"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid3")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng3" value="<%=request.getAttribute("itemeng3")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn3" value="<%=request.getAttribute("itemchn3")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity3" value="<%=request.getAttribute("quantity3")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice3" class="export-cn1" value="<%=request.getAttribute("purprice3")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice3" value="<%=request.getAttribute("unitprice3")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall3" class="unit-price-all" value="<%=request.getAttribute("unitpriceall3")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark3" value="<%=request.getAttribute("shopingmark3")%>"/></td>
+	   			<td><input size="10" type="text" name="nw3" value="<%=request.getAttribute("nw3")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice3" class="true-price" value="<%=request.getAttribute("trueprice3")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode3" value="<%=request.getAttribute("hscode3")%>"/></td>
+	   			<td><input size="10" type="text" name="rate3" value="<%=request.getAttribute("rate3")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid3" value="<%=request.getAttribute("itemid3")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng3"/></td>
+	   			<td><input size="10" type="text" name="itemchn3"/></td>
+	   			<td><input size="10" type="text" name="quantity3"/></td>
+	   			<td><input size="10" type="text" name="purprice3" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice3" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall3" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark3" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw3" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice3" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode3"/></td>
+	   			<td><input size="10" type="text" name="rate3"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid4")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng4" value="<%=request.getAttribute("itemeng4")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn4" value="<%=request.getAttribute("itemchn4")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity4" value="<%=request.getAttribute("quantity4")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice4" class="export-cn1" value="<%=request.getAttribute("purprice4")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice4" value="<%=request.getAttribute("unitprice4")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall4" class="unit-price-all" value="<%=request.getAttribute("unitpriceall4")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark4" value="<%=request.getAttribute("shopingmark4")%>"/></td>
+	   			<td><input size="10" type="text" name="nw4" class="n_weight" value="<%=request.getAttribute("nw4")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice4" class="true-price" value="<%=request.getAttribute("trueprice4")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode4" value="<%=request.getAttribute("hscode4")%>"/></td>
+	   			<td><input size="10" type="text" name="rate4" value="<%=request.getAttribute("rate4")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid4" value="<%=request.getAttribute("itemid4")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng4"/></td>
+	   			<td><input size="10" type="text" name="itemchn4"/></td>
+	   			<td><input size="10" type="text" name="quantity4"/></td>
+	   			<td><input size="10" type="text" name="purprice4" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice4" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall4" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark4" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw4" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice4" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode4"/></td>
+	   			<td><input size="10" type="text" name="rate4"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid5")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng5" value="<%=request.getAttribute("itemeng5")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn5" value="<%=request.getAttribute("itemchn5")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity5" value="<%=request.getAttribute("quantity5")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice5" class="export-cn1" value="<%=request.getAttribute("purprice5")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice5" value="<%=request.getAttribute("unitprice5")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall5" class="unit-price-all" value="<%=request.getAttribute("unitpriceall5")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark5" value="<%=request.getAttribute("shopingmark5")%>"/></td>
+	   			<td><input size="10" type="text" name="nw5" value="<%=request.getAttribute("nw5")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice5" class="true-price" value="<%=request.getAttribute("trueprice5")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode5" value="<%=request.getAttribute("hscode5")%>"/></td>
+	   			<td><input size="10" type="text" name="rate5" value="<%=request.getAttribute("rate5")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid5" value="<%=request.getAttribute("itemid5")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng5"/></td>
+	   			<td><input size="10" type="text" name="itemchn5"/></td>
+	   			<td><input size="10" type="text" name="quantity5"/></td>
+	   			<td><input size="10" type="text" name="purprice5" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice5" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall5" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark5" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw5" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice5" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode5"/></td>
+	   			<td><input size="10" type="text" name="rate5"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid6")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng6" value="<%=request.getAttribute("itemeng6")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn6" value="<%=request.getAttribute("itemchn6")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity6" value="<%=request.getAttribute("quantity6")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice6" class="export-cn1" value="<%=request.getAttribute("purprice6")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice6" value="<%=request.getAttribute("unitprice6")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall6" class="unit-price-all" value="<%=request.getAttribute("unitpriceall6")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark6" value="<%=request.getAttribute("shopingmark6")%>"/></td>
+	   			<td><input size="10" type="text" name="nw6" class="n_weight" value="<%=request.getAttribute("nw6")%>"/></td>
+	   			<td><input size="10" type="text" name="trueprice6" class="true-price" value="<%=request.getAttribute("trueprice6")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode6" value="<%=request.getAttribute("hscode6")%>"/></td>
+	   			<td><input size="10" type="text" name="rate6" value="<%=request.getAttribute("rate6")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid6" value="<%=request.getAttribute("itemid6")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng6"/></td>
+	   			<td><input size="10" type="text" name="itemchn6"/></td>
+	   			<td><input size="10" type="text" name="quantity6"/></td>
+	   			<td><input size="10" type="text" name="purprice6" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice6" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall6" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark6" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw6" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice6" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode6"/></td>
+	   			<td><input size="10" type="text" name="rate6"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid7")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng7" value="<%=request.getAttribute("itemeng7")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn7" value="<%=request.getAttribute("itemchn7")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity7" value="<%=request.getAttribute("quantity7")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice7" class="export-cn1" value="<%=request.getAttribute("purprice7")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice7" value="<%=request.getAttribute("unitprice7")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall7" class="unit-price-all" value="<%=request.getAttribute("unitpriceall7")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark7" value="<%=request.getAttribute("shopingmark7")%>"/></td>
+	   			<td><input size="10" type="text" name="nw7" value="<%=request.getAttribute("nw7")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice7" class="true-price" value="<%=request.getAttribute("trueprice7")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode7" value="<%=request.getAttribute("hscode7")%>"/></td>
+	   			<td><input size="10" type="text" name="rate7" value="<%=request.getAttribute("rate7")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid7" value="<%=request.getAttribute("itemid7")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng7"/></td>
+	   			<td><input size="10" type="text" name="itemchn7"/></td>
+	   			<td><input size="10" type="text" name="quantity7"/></td>
+	   			<td><input size="10" type="text" name="purprice7" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice7" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall7" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark7" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw7" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice7" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode7"/></td>
+	   			<td><input size="10" type="text" name="rate7"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid8")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng8" value="<%=request.getAttribute("itemeng8")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn8" value="<%=request.getAttribute("itemchn8")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity8" value="<%=request.getAttribute("quantity8")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice8"  class="export-cn1" value="<%=request.getAttribute("purprice8")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice8" value="<%=request.getAttribute("unitprice8")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall8" class="unit-price-all" value="<%=request.getAttribute("unitpriceall8")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark8" value="<%=request.getAttribute("shopingmark8")%>"/></td>
+	   			<td><input size="10" type="text" name="nw8" value="<%=request.getAttribute("nw8")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice8" class="true-price" value="<%=request.getAttribute("trueprice8")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode8" value="<%=request.getAttribute("hscode8")%>"/></td>
+	   			<td><input size="10" type="text" name="rate8" value="<%=request.getAttribute("rate8")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid8" value="<%=request.getAttribute("itemid8")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng8"/></td>
+	   			<td><input size="10" type="text" name="itemchn8"/></td>
+	   			<td><input size="10" type="text" name="quantity8"/></td>
+	   			<td><input size="10" type="text" name="purprice8" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice8" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall8" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark8" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw8" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice8" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode8"/></td>
+	   			<td><input size="10" type="text" name="rate8"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid9")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng9" value="<%=request.getAttribute("itemeng9")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn9" value="<%=request.getAttribute("itemchn9")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity9" value="<%=request.getAttribute("quantity9")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice9" class="export-cn1" value="<%=request.getAttribute("purprice9")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice9" value="<%=request.getAttribute("unitprice9")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall9" class="unit-price-all" value="<%=request.getAttribute("unitpriceall9")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark9" value="<%=request.getAttribute("shopingmark9")%>"/></td>
+	   			<td><input size="10" type="text" name="nw9" value="<%=request.getAttribute("nw9")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice9" class="true-price" value="<%=request.getAttribute("trueprice9")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode9" value="<%=request.getAttribute("hscode9")%>"/></td>
+	   			<td><input size="10" type="text" name="rate9" value="<%=request.getAttribute("rate9")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid9" value="<%=request.getAttribute("itemid9")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng9"/></td>
+	   			<td><input size="10" type="text" name="itemchn9"/></td>
+	   			<td><input size="10" type="text" name="quantity9"/></td>
+	   			<td><input size="10" type="text" name="purprice9" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice9" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall9" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark9" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw9" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice9" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode9"/></td>
+	   			<td><input size="10" type="text" name="rate9"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid10")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng10" value="<%=request.getAttribute("itemeng10")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn10" value="<%=request.getAttribute("itemchn10")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity10" value="<%=request.getAttribute("quantity10")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice10" class="export-cn1" value="<%=request.getAttribute("purprice10")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice10" value="<%=request.getAttribute("unitprice10")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall10" class="unit-price-all" value="<%=request.getAttribute("unitpriceall10")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark10" value="<%=request.getAttribute("shopingmark10")%>"/></td>
+	   			<td><input size="10" type="text" name="nw10" value="<%=request.getAttribute("nw10")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice10" class="true-price" value="<%=request.getAttribute("trueprice10")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode10" value="<%=request.getAttribute("hscode10")%>"/></td>
+	   			<td><input size="10" type="text" name="rate10" value="<%=request.getAttribute("rate10")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid10" value="<%=request.getAttribute("itemid10")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng10"/></td>
+	   			<td><input size="10" type="text" name="itemchn10"/></td>
+	   			<td><input size="10" type="text" name="quantity10"/></td>
+	   			<td><input size="10" type="text" name="purprice10" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice10" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall10" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark10" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw10" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice10" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode10"/></td>
+	   			<td><input size="10" type="text" name="rate10"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid11")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng11" value="<%=request.getAttribute("itemeng11")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn11" value="<%=request.getAttribute("itemchn11")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity11" value="<%=request.getAttribute("quantity11")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice11" class="export-cn1" value="<%=request.getAttribute("purprice11")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice11" value="<%=request.getAttribute("unitprice11")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall11" class="unit-price-all" value="<%=request.getAttribute("unitpriceall11")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark11" value="<%=request.getAttribute("shopingmark11")%>"/></td>
+	   			<td><input size="10" type="text" name="nw11" value="<%=request.getAttribute("nw11")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice11" class="true-price" value="<%=request.getAttribute("trueprice11")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode11" value="<%=request.getAttribute("hscode11")%>"/></td>
+	   			<td><input size="10" type="text" name="rate11" value="<%=request.getAttribute("rate11")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid11" value="<%=request.getAttribute("itemid11")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng11"/></td>
+	   			<td><input size="10" type="text" name="itemchn11"/></td>
+	   			<td><input size="10" type="text" name="quantity11"/></td>
+	   			<td><input size="10" type="text" name="purprice11" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice11" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall11" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark11" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw11" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice11" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode11"/></td>
+	   			<td><input size="10" type="text" name="rate11"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid12")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng12" value="<%=request.getAttribute("itemeng12")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn12" value="<%=request.getAttribute("itemchn12")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity12" value="<%=request.getAttribute("quantity12")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice12" class="export-cn1" value="<%=request.getAttribute("purprice12")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice12" value="<%=request.getAttribute("unitprice12")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall12" class="unit-price-all" value="<%=request.getAttribute("unitpriceall12")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark12" value="<%=request.getAttribute("shopingmark12")%>"/></td>
+	   			<td><input size="10" type="text" name="nw12" value="<%=request.getAttribute("nw12")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice12" class="true-price" value="<%=request.getAttribute("trueprice12")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode12" value="<%=request.getAttribute("hscode12")%>"/></td>
+	   			<td><input size="10" type="text" name="rate12" value="<%=request.getAttribute("rate12")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid12" value="<%=request.getAttribute("itemid12")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng12"/></td>
+	   			<td><input size="10" type="text" name="itemchn12"/></td>
+	   			<td><input size="10" type="text" name="quantity12"/></td>
+	   			<td><input size="10" type="text" name="purprice12" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice12" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall12" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark12" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw12" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice12" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode12"/></td>
+	   			<td><input size="10" type="text" name="rate12"/></td>
+		   		<%} %>
+	   		</tr>
+	   		<tr>
+	   			<%
+	   			if(request.getAttribute("itemid13")!=null){
+	   				%>
+	   			<td><input size="10" type="text" name="itemeng13" value="<%=request.getAttribute("itemeng13")%>"/></td>
+	   			<td><input size="10" type="text" name="itemchn13" value="<%=request.getAttribute("itemchn13")%>"/></td>
+	   			<td><input size="10" type="text" name="quantity13" value="<%=request.getAttribute("quantity13")%>"/></td>
+	   			<td><input size="10" type="text" name="purprice13" class="export-cn1" value="<%=request.getAttribute("purprice13")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice13" value="<%=request.getAttribute("unitprice13")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall13" class="unit-price-all" value="<%=request.getAttribute("unitpriceall13")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark13" value="<%=request.getAttribute("shopingmark13")%>"/></td>
+	   			<td><input size="10" type="text" name="nw13" value="<%=request.getAttribute("nw13")%>" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice13" class="true-price" value="<%=request.getAttribute("trueprice13")%>" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode13" value="<%=request.getAttribute("hscode13")%>"/></td>
+	   			<td><input size="10" type="text" name="rate13" value="<%=request.getAttribute("rate13")%>"/></td>
+	   			<td><input size="10" type="hidden" name="itemid13" value="<%=request.getAttribute("itemid13")%>"/></td>
+		   		<%
+		   			}else{
+		   		%>
+		   		<td><input size="10" type="text" name="itemeng13"/></td>
+	   			<td><input size="10" type="text" name="itemchn13"/></td>
+	   			<td><input size="10" type="text" name="quantity13"/></td>
+	   			<td><input size="10" type="text" name="purprice13" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice13" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall13" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark13" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw13" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice13" class="true-price" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode13"/></td>
+	   			<td><input size="10" type="text" name="rate13"/></td>
+		   		<%} %>
+	   		</tr>
+	   	</table>
+	   	<br/>
+	   	指定货代（如果有）(用&ltbr&gt换行)：<textarea name="frieght"  cols="45" rows="5"><%=request.getAttribute("frieght")%></textarea>
+	   	<br/>
+	   		*物流填写：报关发票号：<input name="Nonum" type="text" value="<%=request.getAttribute("Nonum")%>"/>
+	   	发票日期：<input name="date" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("date")%>"/></input>
+	   	sailing Date:<input name="saildate" id="saildate" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("saildate")%>"/>
+	   	Arrive Date:<input name="arriveDate" id="arriveDate" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("arriveDate")%>"/>
+	   		<br/>
+	   	货代:<input name="huodai" type="text" value="<%=request.getAttribute("huodai")%>"/>
+	   	运费:<input name="yunfei" type="text" value="<%=request.getAttribute("yunfei")%>"/>(* FOB 无运费)
+   	 	<br/>
+   	 	运费方式 :<input type="radio" name="yunfeifs" value="COLLECT"/>到付
+			<input type="radio" name="yunfeifs" value="PREPAID"/>预付
+		保费:<input name="premium" type="text" value="<%=request.getAttribute("premium")%>"/>
+			<br/>
+		外销合同时间:<input name="waixiaotime" id="contract_date" type="text" onClick="WdatePicker()" value="<%=request.getAttribute("waixiaotime")%>"/>
+			<br/>
+				<script type="text/javascript">
+		    window.onload = function(){
+		    var checked = '<%=request.getAttribute("currency")%>'
+		    	if(checked == 'GBP'){
+                   alert("货币单位是GBP");
+				}
+				if(checked == 'EUR'){
+				   alert("货币单位是EUR");
+				}
+				if(checked == 'AUD'){
+				   alert("货币单位是AUD");
+				}
+				if(checked == 'RMB'){
+				   alert("货币单位是RMB");
+				}
+		    
+		        var radios = document.getElementsByName('currency');
+		        var len = radios.length;
+		        for(var i=0;i<len;i++){
+		            if(checked==radios[i].value){
+		                radios[i].setAttribute('checked','checked');
+		            }
+		        }
+		       var checkedss='<%=request.getAttribute("transaction2")%>';
+		        var radioss = document.getElementsByName('transaction2');
+		        var lens = radioss.length;
+		        for(var j=0;j<lens;j++){
+		            if(checkedss==radioss[j].value){
+		                radioss[j].setAttribute('checked','checked');
+		            }
+		        }
+		        var checkedfs='<%=request.getAttribute("yunfeifs")%>';
+		        var radiofs = document.getElementsByName('yunfeifs');
+		        var lenfs = radiofs.length;
+		        for(var t=0;t<lenfs;t++){
+		            if(checkedfs==radiofs[t].value){
+		                radiofs[t].setAttribute('checked','checked');
+		            }
+		        }
+		    }
+		</script>
+   	</table>
+   <br/>
+   <input type="submit" value="保存修改" onclick="update_order()"></input>
+   </form>
+   <form action="DeleteServlet">
+   <table>
+   		<input type="hidden" name="id" value="<%=request.getAttribute("id")%>"/>
+   		<input type="submit" onclick="return confirm('真的要删除吗?')" name="submit1" value="删除">
+   		<%--<input type="submit" value="删除"></input>
+   		--%></table>
+   </form>
+  </body>
+</html>

@@ -1,0 +1,558 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>出运联系单</title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<script type="text/javascript" src="../My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script>	
+
+	<script type="text/javascript">
+	
+
+	    //获取NBMail客户地址
+	    function query_addr_from_NBMail(){
+            var eid = $('#erp_id').val(); 
+	    	if(eid == null || eid == "" || eid == undefined){
+	    		alert("请输入ERP Id");
+	    		return false;
+	    	}
+	    	var auth = $('#auth').val();
+	    	$.ajax({
+				type : "post",
+				datatype : "json",
+				url : "GetShippingAttrServlet",
+				data : {
+					"eid" : eid,
+				},
+				success : function(result) {
+					if(result == null || result == "" || result == undefined || result == 'NO'){
+						$('#attr').show();
+						$('#attr_msg').hide();
+						alert("未获取到客户地址");						
+					}else{
+						var customerName = '';
+						var s = result.split("CustomerName:");
+						if(s.length != 0){
+							customerName = s[1];
+						}
+						if(auth == 1){
+							$('#attr_msg').hide();
+							$('#attr').show();
+							$('#attr').val(result);
+							$('#client_name').val(customerName);
+							$('#attr_source').val(1);
+						}else{
+							$('#attr').hide();
+							$('#attr').val(result);
+							$('#attr_msg').show();
+							$('#attr_msg').val('获取成功');
+							$('#client_name').val(customerName);
+							$('#attr_source').val(1);
+						}
+						
+					}
+				},
+				error : function() {
+					alert("未获取到客户地址");	
+				}
+			});
+	    }
+	    
+	    
+	    $(function(){  
+	    /**
+	     *计算重量
+	     */
+	    $('.n_weight').blur(function(){
+	    	var totalNW = 0;
+	   	    $('.n_weight').each(function(i){
+	   	    	var weight = $(this).val();
+	   	    	if(isNaN(weight) || weight == "" || weight == undefined){
+	   	    		return true;
+	   	    	}else{
+	   	    		totalNW +=Number(weight);
+	   	    		$('#totalNW').val(Number(totalNW).toFixed(1));
+	   	    	}	   	    	
+	   	    })
+	   	    
+	    })
+	    
+	    }) 
+	    
+	    //验算出口人民币和采购价是否一致
+	    function save_order(){
+	    	
+	    	var totalExportPrice = 0;
+	    	var totalPurchasePrice = 0;
+	 
+	    	$('.export-cn').each(function(){
+	    		var exportPrice = $(this).val();
+	   	    	if(isNaN(exportPrice) || exportPrice == "" || exportPrice == undefined){
+	   	    		return true;
+	   	    	}else{
+	   	    		totalExportPrice +=Number(exportPrice);
+	   	    	}	   	    
+	    	})
+	    	
+	    	
+	    	$('.export-cn1').each(function(){
+	    		var purchasePrice = $(this).val();
+	   	    	if(isNaN(purchasePrice) || purchasePrice == "" || purchasePrice == undefined){
+	   	    		return true;
+	   	    	}else{
+	   	    		totalPurchasePrice +=Number(purchasePrice);
+	   	    	}	   	    
+	    	})
+	    	
+	    	if(Number(totalExportPrice).toFixed(2) != Number(totalPurchasePrice).toFixed(2)){
+	    		alert("出口人民币和采购总价不一致！");
+	    		return false;
+	    	}	
+	    	
+	    	//验算毛重是否大于净重
+	    	var totalGW = $('#totalGW').val();
+	    	var totalNW = $('#totalNW').val();
+	    	if(Number(totalGW) < Number(totalNW)){
+	    		alert("毛重不能小于净重！");
+	    		return false;
+	    	}
+	    	
+	    	//验证净重是否相等
+	     	var totalNWCal = 0;
+	   	    $('.n_weight').each(function(i){
+	   	    	var weight = $(this).val();
+	   	    	if(isNaN(weight) || weight == "" || weight == undefined){
+	   	    		return true;
+	   	    	}else{
+	   	    		totalNWCal +=Number(weight);
+	   	    	}	   	    	
+	   	    })
+	    	if(totalNW != totalNWCal){
+	    		alert("净重不相等！");
+	    		return false;
+	    	}
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	//验算清关总价是否等于数量*单价	
+	       var flag = true;	
+	       $('.unit-price-all').each(function(){	
+	    	  var priceAll = $(this).val(); 
+	    	  var quantity = $(this).parent().parent().find('input').eq(2).val();
+	    	  var unitPrice = $(this).parent().parent().find('input').eq(4).val();
+	    	  var calPrice = priceAll / quantity;
+	    	  if(isNaN(calPrice) || calPrice == "" || calPrice == undefined){
+	    		  if(unitPrice != ''){
+			    		alert("清关总价不等于数量*单价！");
+			    		flag = false;
+			    		return false;
+			    	}	 	    	
+	    	  }else{
+	    		  if(Number(calPrice).toFixed(0) != Number(unitPrice).toFixed(0)){
+			    		alert("清关总价不等于数量*单价！");
+			    		flag = false;
+			    		return false;
+			    	}	 	    	  
+	    	  }
+	    	
+	      })    		    	
+	        if(!(flag)){
+	        	return false;	
+	        }
+	       
+	        if($('#contract_date').val() == null || $('#contract_date').val() == ''){
+	        	alert("请输入外销合同时间");
+	        	return false;
+	        }
+	       
+	       
+	    	$('#order_form').submit();
+	    }
+	    
+	    
+	    
+	    /**
+	     *确认货币单元
+	     */
+	    function confirm_currency(obj){
+	    	var select_currency = $("#select_currency").val();
+	    	var currency = $(obj).val();
+    		if (confirm("确认修改货币单位?")) {	  
+    			$("#select_currency").val(currency);
+	    	}else{
+	    	  $(":radio[name='currency'][value='" + select_currency + "']").attr("checked",true);
+	    	}
+	    	
+	    }
+	    
+	    
+  
+	    
+	    
+	</script>
+  </head>  
+  <body>
+  	<a href="../HistoryServlet" target="showframe">录入历史</a>
+  	<br/>
+  	<h1>出运联系单-> (出口发票+装箱单+报关单）</h1>
+   <form action="../SaveServlet"  method="post" onsubmit="return false;" id="order_form">
+        <input type="hidden" id="auth" value="${sessionScope.auth}">
+        <input type="hidden" id="attr_source" name="attrSource">  <!-- 地址来源（1、NBMail获取到的地址） -->
+        <input type="hidden" id="select_currency"  value="USD">
+   		客户ERP ID：<input id="erp_id" type="text"/>
+   		           <input type="button" style="margin-bottom: 5px;" onclick="query_addr_from_NBMail()" value="查询地址"><br>
+   		采购：<input name="purchase" type="text"/>
+   		销售：<input name="sale" type="text"/>
+   		客户名：<input name="clientName" id="client_name" type="text"/>
+	   	<br/>
+	   	收货人地址(用&ltbr&gt换行)：<textarea id="attr" name="address" cols="45" rows="5"></textarea>
+	   	<textarea  id="attr_msg" style="display:none;" cols="45" rows="5"></textarea>
+	   	<br/>
+	   	<table border="1">
+	   		<tr>
+	   			<td>采购合同号</td>
+	   			<td>工厂名称</td>
+	   			<td>合同金额(格式：100000.00)</td>
+	   			<td>第几次出货批次</td>
+	   			<td>总共几次出货批次</td>
+	   			<td>本次出口人民币金额(格式：100000.00)</td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno1" class="order-id"/></td>
+	   			<td><input type="text" name="factory1"/></td>
+	   			<td><input type="text" name="money1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times1"/></td>
+	   			<td><input type="text" name="totaltimes1"/></td>
+	   			<td><input type="text" name="rmb1" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno2" class="order-id"/></td>
+	   			<td><input type="text" name="factory2"/></td>
+	   			<td><input type="text" name="money2" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times2"/></td>
+	   			<td><input type="text" name="totaltimes2"/></td>
+	   			<td><input type="text" name="rmb2" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno3" class="order-id"/></td>
+	   			<td><input type="text" name="factory3"/></td>
+	   			<td><input type="text" name="money3" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times3"/></td>
+	   			<td><input type="text" name="totaltimes3"/></td>
+	   			<td><input type="text" name="rmb3" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno4" class="order-id"/></td>
+	   			<td><input type="text" name="factory4"/></td>
+	   			<td><input type="text" name="money4" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times4"/></td>
+	   			<td><input type="text" name="totaltimes4"/></td>
+	   			<td><input type="text" name="rmb4" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno5" class="order-id"/></td>
+	   			<td><input type="text" name="factory5"/></td>
+	   			<td><input type="text" name="money5" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times5"/></td>
+	   			<td><input type="text" name="totaltimes5"/></td>
+	   			<td><input type="text" name="rmb5" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno6" class="order-id"/></td>
+	   			<td><input type="text" name="factory6"/></td>
+	   			<td><input type="text" name="money6" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times6"/></td>
+	   			<td><input type="text" name="totaltimes6"/></td>
+	   			<td><input type="text" name="rmb6" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno7" class="order-id"/></td>
+	   			<td><input type="text" name="factory7"/></td>
+	   			<td><input type="text" name="money7" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times7"/></td>
+	   			<td><input type="text" name="totaltimes7"/></td>
+	   			<td><input type="text" name="rmb7" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno8" class="order-id"/></td>
+	   			<td><input type="text" name="factory8"/></td>
+	   			<td><input type="text" name="money8" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times8"/></td>
+	   			<td><input type="text" name="totaltimes8"/></td>
+	   			<td><input type="text" name="rmb8" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno9" class="order-id"/></td>
+	   			<td><input type="text" name="factory9"/></td>
+	   			<td><input type="text" name="money9" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times9"/></td>
+	   			<td><input type="text" name="totaltimes9"/></td>
+	   			<td><input type="text" name="rmb9" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input type="text" name="purno10" class="order-id"/></td>
+	   			<td><input type="text" name="factory10"/></td>
+	   			<td><input type="text" name="money10" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input type="text" name="times10"/></td>
+	   			<td><input type="text" name="totaltimes10"/></td>
+	   			<td><input type="text" name="rmb10" class="export-cn" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   		</tr>
+	   	</table>
+	   	<br/>
+	   	希望出口日期:<input name="hopeDate" type="text" onClick="WdatePicker()"/>
+	   	预计工厂可送仓日期:<input name="estimateDate" type="text" onClick="WdatePicker()"/>
+	   	<br/>
+	   	
+	   	交易方式 Term:<input name="transaction1" type="text"/>
+	   	货运方式 :<input type="radio" name="transaction2" value="海运" checked>海运
+				<input type="radio" name="transaction2" value="陆运">陆运
+				<input type="radio" name="transaction2" value="空运">空运
+				<input type="radio" name="transaction2" value="快递">快递
+	   	<br/>
+	   	总体积(CBM):<input name="volume" type="text"/>
+	   	总毛重 G.W(KGS):<input name="totalGW" type="text" id="totalGW"/>
+	   	总净重 N.W(KGS): <input name="totalNW" type="text" id="totalNW"/>
+	   	<br/>
+	   	
+	   	From:<input name="fromwhere" type="text" value="上海"/>
+	   	To:<input name="towhere" type="text"/>
+	   	<br/>
+	   	Package 包装类型:<input name="package" type="text"/>
+	   	Package 包装数量:<input name="packageNum" type="text"/>
+	   	支付币种： <input type="radio" name="currency" value="USD" checked onchange="confirm_currency(this)">美元
+				<input type="radio" name="currency" value="EUR" onchange="confirm_currency(this)">欧元
+				<input type="radio" name="currency" value="GBP" onchange="confirm_currency(this)">英镑
+				<input type="radio" name="currency" value="RMB" onchange="confirm_currency(this)">人民币
+				<input type="radio" name="currency" value="AUD" onchange="confirm_currency(this)">澳元
+	   	<br/>
+	   托盘/木箱尺寸：<input name="palletDimension" type="text">	<br/>
+	   小箱件数(美国货必填)：<input name="casketQuantity" type="number"><br/>
+	   订框箱型：<select name="casketType">
+			   <option></option>
+			   <option>40尺高柜</option>
+			   <option>40尺平柜</option>
+			   <option>20尺柜</option>
+			   <option>拼箱</option>
+			   <option>特殊柜</option>
+			 </select>
+	   	 <br/><br/>
+	  特殊要求备注(用&ltbr&gt换行)：<textarea name="detailed" cols="45" rows="5"></textarea>
+	   	<br/>
+	   	<table border="1">
+	   		<tr>
+	   			<td width="80px">Item英文名</td>
+	   			<td width="80px">Item中文名</td>
+			    <td width="80px">Quantity(请只填数字)</td>
+			    <td width="80px"><strong>采购价 总价(只填数字 单位:RMB)(格式：100000.00)</strong></td>
+			    <td width="80px">Unit Price(对外销售单价)</td>
+			    <td width="80px">(客户)清关总价(格式：100000.00)</td>
+			    <td width="80px">Shipping Mark</td>
+			    <td width="80px"><p>N.W.(请只填数字 单位:KGS)</p></td>
+			    <td width="80px">实际报关总价(会计填)(格式：100000.00)</td>
+			    <td width="150px">HS Code (物流填)</td>
+			    <td width="80px">退税率 (物流填 *%)</td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng1"/></td>
+	   			<td><input size="10" type="text" name="itemchn1"/></td>
+	   			<td><input size="10" type="text" name="quantity1"/></td>
+	   			<td><input size="10" type="text" name="purprice1" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall1" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark1" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw1" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode1"/></td>
+	   			<td><input size="10" type="text" name="rate1"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng2"/></td>
+	   			<td><input size="10" type="text" name="itemchn2"/></td>
+	   			<td><input size="10" type="text" name="quantity2"/></td>
+	   			<td><input size="10" type="text" name="purprice2" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice2" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall2" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark2" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw2" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice2" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode2"/></td>
+	   			<td><input size="10" type="text" name="rate2"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng3"/></td>
+	   			<td><input size="10" type="text" name="itemchn3"/></td>
+	   			<td><input size="10" type="text" name="quantity3"/></td>
+	   			<td><input size="10" type="text" name="purprice3" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice3" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall3" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark3" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw3" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice3" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode3"/></td>
+	   			<td><input size="10" type="text" name="rate3"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng4"/></td>
+	   			<td><input size="10" type="text" name="itemchn4"/></td>
+	   			<td><input size="10" type="text" name="quantity4"/></td>
+	   			<td><input size="10" type="text" name="purprice4" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice4" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall4" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark4" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw4" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice4" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode4"/></td>
+	   			<td><input size="10" type="text" name="rate4"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng5"/></td>
+	   			<td><input size="10" type="text" name="itemchn5"/></td>
+	   			<td><input size="10" type="text" name="quantity5"/></td>
+	   			<td><input size="10" type="text" name="purprice5" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice5" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall5" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark5" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw5" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice5" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode5"/></td>
+	   			<td><input size="10" type="text" name="rate5"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng6"/></td>
+	   			<td><input size="10" type="text" name="itemchn6"/></td>
+	   			<td><input size="10" type="text" name="quantity6"/></td>
+	   			<td><input size="10" type="text" name="purprice6" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice6" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall6" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark6" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw6" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice6" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode6"/></td>
+	   			<td><input size="10" type="text" name="rate6"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng7"/></td>
+	   			<td><input size="10" type="text" name="itemchn7"/></td>
+	   			<td><input size="10" type="text" name="quantity7"/></td>
+	   			<td><input size="10" type="text" name="purprice7" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice7" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall7" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark7" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw7" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice7" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode7"/></td>
+	   			<td><input size="10" type="text" name="rate7"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng8"/></td>
+	   			<td><input size="10" type="text" name="itemchn8"/></td>
+	   			<td><input size="10" type="text" name="quantity8"/></td>
+	   			<td><input size="10" type="text" name="purprice8" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice8" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall8" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark8" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw8" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice8" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode8"/></td>
+	   			<td><input size="10" type="text" name="rate8"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng9"/></td>
+	   			<td><input size="10" type="text" name="itemchn9"/></td>
+	   			<td><input size="10" type="text" name="quantity9"/></td>
+	   			<td><input size="10" type="text" name="purprice9" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice9" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall9" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark9" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw9" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice9" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode9"/></td>
+	   			<td><input size="10" type="text" name="rate9"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng10"/></td>
+	   			<td><input size="10" type="text" name="itemchn10"/></td>
+	   			<td><input size="10" type="text" name="quantity10"/></td>
+	   			<td><input size="10" type="text" name="purprice10" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice10" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall10" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark10" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw10" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice10" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode10"/></td>
+	   			<td><input size="10" type="text" name="rate10"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng11"/></td>
+	   			<td><input size="10" type="text" name="itemchn11"/></td>
+	   			<td><input size="10" type="text" name="quantity11"/></td>
+	   			<td><input size="10" type="text" name="purprice11" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice11" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall11" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark11" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw11" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice11" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode11"/></td>
+	   			<td><input size="10" type="text" name="rate11"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng12"/></td>
+	   			<td><input size="10" type="text" name="itemchn12"/></td>
+	   			<td><input size="10" type="text" name="quantity12"/></td>
+	   			<td><input size="10" type="text" name="purprice12" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice12" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall12" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark12" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw12" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice12" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode12"/></td>
+	   			<td><input size="10" type="text" name="rate12"/></td>
+	   		</tr>
+	   		<tr>
+	   			<td><input size="10" type="text" name="itemeng13"/></td>
+	   			<td><input size="10" type="text" name="itemchn13"/></td>
+	   			<td><input size="10" type="text" name="quantity13"/></td>
+	   			<td><input size="10" type="text" name="purprice13" class="export-cn1" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitprice13" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="unitpriceall3" class="unit-price-all" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="10" type="text" name="shopingmark13" value="N/M"/></td>
+	   			<td><input size="10" type="text" name="nw13" class="n_weight"/></td>
+	   			<td><input size="10" type="text" name="trueprice13" onkeyup="value=value.replace(/[^\d\.]/g,'')" onblur="value=value.replace(/[^\d\.]/g,'')"/></td>
+	   			<td><input size="20" type="text" name="hscode13"/></td>
+	   			<td><input size="10" type="text" name="rate13"/></td>
+	   		</tr>
+	   		
+	   		
+	   	</table>
+	   	<br/>
+	   	指定货代（如果有）(用&ltbr&gt换行)：<textarea name="frieght" cols="45" rows="5"></textarea>
+	   	<br/>
+	   		*物流填写：报关发票号：<input name="Nonum" type="text"/>
+	   	发票日期：<input name="date" type="text" onClick="WdatePicker()"/></input>
+	   	sailing Date:<input name="saildate" type="text" onClick="WdatePicker()"/>
+	   	<br/>
+	   	货代:<input name="huodai" type="text"/>
+	   	运费:<input name="yunfei" type="text"/>(* FOB 无运费)
+	   	<br/>
+	   	运费方式 :<input type="radio" name="yunfeifs" value="COLLECT" checked>到付
+				<input type="radio" name="yunfeifs" value="PREPAID">预付
+		保费:<input name="premium" type="text"/>
+		<br/>
+		外销合同时间：<input id="contract_date" name="waixiaotime" type="text" onClick="WdatePicker()"/></input>
+   <br/>
+   <input type="submit" value="提交" onclick="save_order()"></input>
+   </form>
+  </body>
+</html>
